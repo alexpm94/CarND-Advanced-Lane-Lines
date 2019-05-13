@@ -27,6 +27,11 @@ The goals / steps of this project are the following:
 [image_thresh]: ./examples/thresh.jpg "Threshold"
 [image_points]: ./examples/points_select.jpg "Points selection"
 [image_warp]: ./examples/warped.jpg "Image Warped"
+[image_fit1]: ./examples/fit1.jpg "Image fit 1"
+[image_fit2]: ./examples/fit2.png "Image fit 2"
+[image_fit3]: ./examples/fit3.png "Image fit 3"
+[image_val]: ./examples/image_validation.jpg "Validation"
+
 [video1]: ./project_video.mp4 "Video"
 
 ## [Rubric](https://review.udacity.com/#!/rubrics/571/view) Points
@@ -99,19 +104,42 @@ I verified that my perspective transform was working as expected by verifying th
 
 #### 4. Describe how (and identify where in your code) you identified lane-line pixels and fit their positions with a polynomial?
 
-Then I did some other stuff and fit my lane lines with a 2nd order polynomial kinda like this:
+I used the sliding windows method. The first step is to calculate the histogram of the white pixels on the half bottom of the image, then find the peaks. The location of the peaks will be the starting point for the first window. I decided to set a margin of 40 pixels, as I eliminate most of noise in the thresholding step. The number of windows were set to 7.
 
-![alt text][image5]
+In the images bellow you can see some examples of the fit to a polinomail.
+
+![alt text][image_fit1]
+![alt text][image_fit2]
+![alt text][image_fit3]
 
 #### 5. Describe how (and identify where in your code) you calculated the radius of curvature of the lane and the position of the vehicle with respect to center.
+To reach this, firstly I converted pixels to meters. So when I calculate the polynamial in pixels, I also do it in meters `In [8]`.
 
-I did this in lines # through # in my code in `my_other_file.py`
+```python
+    left_fit_m = np.polyfit(lefty*ym_per_pix, leftx*xm_per_pix, 2)
+    right_fit_m = np.polyfit(righty*ym_per_pix, rightx*xm_per_pix, 2)
+   ```
+Then, to calculate the curvature for each line, I did the following.
+```python
+	 ((1 + (2*line_fit_m[0]*y_max + line_fit_m[1])**2)**1.5) / np.absolute(2*line_fit_m[0])
+```
+Finally, to get the distance to the center I denied a function called get_distance(),where I did the following calculation:
+```python
+    # Calculate vehicle center
+    xMax = img_shape[1]*xm_per_pix
+    yMax = img_shape[0]*ym_per_pix
+    vehicleCenter = xMax / 2
+    lineLeft = left_fit_m[0]*yMax**2 + left_fit_m[1]*yMax + left_fit_m[2]
+    lineRight = right_fit_m[0]*yMax**2 + right_fit_m[1]*yMax + right_fit_m[2]
+    lineMiddle = lineLeft + (lineRight - lineLeft)/2
+    diffFromVehicle = lineMiddle - vehicleCenter
+```
 
 #### 6. Provide an example image of your result plotted back down onto the road such that the lane area is identified clearly.
 
-I implemented this step in lines # through # in my code in `yet_another_file.py` in the function `map_lane()`.  Here is an example of my result on a test image:
+I implemented this step by `In [9]`. Here is an example of my result on a test image:
 
-![alt text][image6]
+![alt text][image_val]
 
 ---
 
@@ -119,7 +147,7 @@ I implemented this step in lines # through # in my code in `yet_another_file.py`
 
 #### 1. Provide a link to your final video output.  Your pipeline should perform reasonably well on the entire project video (wobbly lines are ok but no catastrophic failures that would cause the car to drive off the road!).
 
-Here's a [link to my video result](./project_video.mp4)
+Here's a [link to my video result](./output_images/out0.mp4)
 
 ---
 
@@ -127,4 +155,10 @@ Here's a [link to my video result](./project_video.mp4)
 
 #### 1. Briefly discuss any problems / issues you faced in your implementation of this project.  Where will your pipeline likely fail?  What could you do to make it more robust?
 
-Here I'll talk about the approach I took, what techniques I used, what worked and why, where the pipeline might fail and how I might improve it if I were going to pursue this project further.  
+Here I'll talk about the approach I took, what techniques I used, what worked and why, where the pipeline might fail and how I might improve it if I were going to pursue this project further.
+
+1. When the floor changes of color, it does not perform the best. The cause is that I did not implement search around the previous calculated polynomial. So I don't track the lane detection, and this also causes a computational time cost. 
+
+2.For lighting conditions, I would like to test methods like CLAHE and Gamma correction, in order to normalize the lighting conditions.
+
+3.My principal goal was to reach a good performance on the challenge videos, however I did not get the time and I should move forward on the other projects. One solution for the challenge videos would be the use of deep learning. As the position of the car is almost centered the most of the time, it would be easy to get labeled data to train the model. Once I completed the first term, I'm sure I'm gonna get back an try this. 
