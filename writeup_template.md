@@ -23,8 +23,10 @@ The goals / steps of this project are the following:
 [image5]: ./examples/color_fit_lines.jpg "Fit Visual"
 [image6]: ./examples/example_output.jpg "Output"
 [image_calib]: ./examples/calibration.jpg "Calibration"
-[image_undist]: ./exampes/undist.jpg "Undistorted Image"
+[image_undist]: ./examples/undist.jpg "Undistorted Image"
 [image_thresh]: ./examples/thresh.jpg "Threshold"
+[image_points]: ./examples/points_select.jpg "Points selection"
+[image_warp]: ./examples/warped.jpg "Image Warped"
 [video1]: ./project_video.mp4 "Video"
 
 ## [Rubric](https://review.udacity.com/#!/rubrics/571/view) Points
@@ -64,7 +66,7 @@ To demonstrate this step, I will describe how I apply the distortion correction 
 
 #### 2. Describe how (and identify where in your code) you used color transforms, gradients or other methods to create a thresholded binary image.  Provide an example of a binary image result.
 
-I used a combination of color and gradient thresholds to generate a binary image (thresholding steps at cell 5).
+I used a combination of color and gradient thresholds to generate a binary image `In [5]`.
 Firstly I decided to apply a Gaussian blur filter in order to make spots and shadows smooother. Then I converted the image to hls and kept the s channel. Separately I applied sobel and finally added this two thresholded images.
 Here's an example of my output for this step from one of the crucial test cases. 
 
@@ -72,12 +74,15 @@ Here's an example of my output for this step from one of the crucial test cases.
 
 #### 3. Describe how (and identify where in your code) you performed a perspective transform and provide an example of a transformed image.
 
-The code for my perspective transform includes a function called `warp()`, which appears in In [3].  The `warp()` function takes as inputs an image (`img`), as well as the region of interest (roi). The roi is meant to crop the image so that the warped image is cropped by:
+The code for my perspective transform includes a function called `warp()`, which appears in `In [3]`.  The `warp()` function takes as inputs an image (`img`), as well as the region of interest (roi). The roi is meant to crop the image so that the warped image is cropped by:
 
 ```python
 	img_warped[roi[2]:roi[3],roi[0]:roi[1]]
 ```
 Where img_warped is the image after transformation.
+
+To select the src points, I opened an image editor, select the 4 points as shown bellow and save the point's coordinates.
+![alt text][image_points]
 
 This resulted in the following source and destination points:
 
@@ -88,9 +93,9 @@ This resulted in the following source and destination points:
 | 280, 675     | 500, 700      |
 | 588, 455      | 500, 350       |
 
-I verified that my perspective transform was working as expected by drawing the `src` and `dst` points onto a test image and its warped counterpart to verify that the lines appear parallel in the warped image.
+I verified that my perspective transform was working as expected by verifying that the lines appear parallel in the warped image.
 
-![alt text][image4]
+![alt text][image_warp]
 
 #### 4. Describe how (and identify where in your code) you identified lane-line pixels and fit their positions with a polynomial?
 
